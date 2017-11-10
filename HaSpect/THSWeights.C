@@ -2,6 +2,12 @@
 	\class THSWeights
 	
 	Class to control weight structures in HaSpect.
+	Consists of 1 tree with event IDs
+	And 1 tree with the weights of the different species
+	It relies on being able to read the trees into memory
+	to sort the ordering, this may cause issues with order >10^7
+	events
+	
 	
 */
 
@@ -238,7 +244,7 @@ void THSWeights::SortWeights(){
    
   cout<<"THSWeights::SortWeights() reordering trees "<<fWTree->GetDirectory()<<endl; 
   for( Long64_t i =  0; i < fN ; i++ ) {
-     fID=fIDv[i];
+    fID=fIDv[i];
     idtree->Fill(); //fill as ordered by the build index
     //wtree is synched with id tree
     Mwtree->GetEntry(fIDi[i]);
@@ -266,7 +272,9 @@ void THSWeights::SortWeights(){
   //  BuildIndex();//build for new tree!
   fIsSorted=kTRUE;
 }
-
+/////////////////////////////////////////////////////////////////
+///Set file for keeping weights on disk
+//Should be done before sort etc to save memory
 void THSWeights::SetFile(TString filename){
   TDirectory *saveDir=gDirectory;
   cout<<"THSWeights::SetFile "<<filename<<endl;
@@ -275,7 +283,8 @@ void THSWeights::SetFile(TString filename){
   if(fWTree)fWTree->SetDirectory(fFile);
   saveDir->cd();
 }
-
+////////////////////////////////////////////////////////////////
+///Finally save weights to disk
 void THSWeights::Save(){
   cout<<"void THSWeights::Save() "<<fFile<<endl;
   cout<<fIDTree<<" "<<fWTree<<endl;
@@ -294,7 +303,11 @@ void THSWeights::Save(){
   cout<<"THSWeights::Save() Saved weights to file"<<endl;
 
 }
-
+///////////////////////////////////////////////////////////////
+///Give file name and name (in .root file) of weights object to load weights
+///into and empty weights object
+///e.g. THSWeights* wts=new THSWeights();
+///     wts->LoadSaved("path_to_/Weight_File.root","HSWeight");
 void THSWeights::LoadSaved(TString fname,TString wname){
   TDirectory* savedir=gDirectory;
   TFile* wfile=new TFile(fname);

@@ -135,14 +135,24 @@ void hslogon(){
 void CleanAll(){
 
   TString HSANA=gSystem->Getenv("HSANA");
-  TString CurDir=gSystem->Getenv("PWD");
-  gSystem->Exec(Form("cd %s",HSANA.Data()));
-  gSystem->Exec("rm *.so");
-  gSystem->Exec("rm *.d");
-  gSystem->Exec("rm *.pcm");
+  cout<<"Tidying up "<<HSANA<<endl;
+  gSystem->Exec(Form("rm %s/*.so",HSANA.Data()));
+  gSystem->Exec(Form("rm %s/*.d",HSANA.Data()));
+  gSystem->Exec(Form("rm %s/*.pcm",HSANA.Data()));
+  if(gSystem->Getenv("RHIPO")){
+    TString RHIPO=gSystem->Getenv("RHIPO");
+    gSystem->Exec(Form("rm %s/*.so",RHIPO.Data()));
+    gSystem->Exec(Form("rm %s/*.d",RHIPO.Data()));
+    gSystem->Exec(Form("rm %s/*.pcm",RHIPO.Data()));
+  }
+  if(gSystem->Getenv("CHIPO")){
+    TString CHIPO=gSystem->Getenv("CHIPO");
+    gSystem->Exec(Form("rm %s/*.so",CHIPO.Data()));
+    gSystem->Exec(Form("rm %s/*.d",CHIPO.Data()));
+    gSystem->Exec(Form("rm %s/*.pcm",CHIPO.Data()));
+  }
 
 
-  gSystem->Exec(Form("cd %s",CurDir.Data()));
 }
 
 /** Function is called with \--hsfit \n
@@ -214,6 +224,8 @@ void HSFinal(TString pname){
   LoadMacro("THSWeights.C");
   LoadMacro("THSDataManager.C");
   LoadMacro("THSKinematics.C");
+  LoadMacro("THSCombitorial.C");
+  LoadMacro("THSParticleIter.C");
   LoadMacro("THSFinalState.C");
   LoadMacro(pname+".C");
 

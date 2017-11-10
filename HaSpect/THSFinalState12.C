@@ -382,7 +382,7 @@ THSParticleIter* THSFinalState::CreateParticleIter(Int_t topo,vector<THSParticle
   diter->SetCombi(THSSelection());
   diter->SetParticles(parts);
   diter->SetNSel(Nsel);
-  cout<<diter<<" "<<topo<<" "<<parts<<endl;
+
   if(!fDetIter[topo])
     fDetIter[topo]=diter;
   else

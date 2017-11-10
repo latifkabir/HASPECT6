@@ -13,6 +13,8 @@
 #include "TLorentzVector.h"
 #include "TVector3.h"
 #include "TDatabasePDG.h"
+#include "TMatrixD.h"
+#include <vector>
 #include <iostream>
 using namespace std;
 
@@ -21,21 +23,27 @@ class THSParticle {
  protected:
   TLorentzVector fP4;  //4-vector 
   TVector3 fVertex;     //particle vertex position
-  //TVector3 fPol;     //polarisation vector
   Int_t fPDGCode;           //PDG number
-  Double_t fPDGMass;
-  Double_t fMeasMass; //Or other PID info
-  Double_t fTime;
-  Double_t fPath;
-  Double_t fDoca;
-  Double_t fEdep;
-
-  //TMatrixD fCovarianceMatrix;
+  /* Double_t fPDGMass; */
+  /* Double_t fMeasMass; //Or other PID info */
+  /* Double_t fTime; */
+  /* Double_t fPath; */
+  /* Double_t fDoca; */
+  /* Double_t fEdep; */
+  Float_t fPDGMass;
+  Float_t fMeasMass; //Or other PID info
+  Float_t fTime;
+  Float_t fPath;
+  Float_t fDoca;
+  Float_t fEdep;
   Int_t fDetector=0; //detector code
-  
-  TLorentzVector fTruthP4; //true generated 4-vector
-  TVector3 fTruthV; //true generated vertex
-  Int_t fTruthPDG;
+
+  vector<Float_t> fCovaMatEntries;
+  TMatrixD fCovarianceMatrix;//!
+
+  TLorentzVector fTruthP4;// true generated 4-vector
+  TVector3 fTruthV;// true generated vertex
+  Int_t fTruthPDG;// true PDG code
   
   Bool_t fTruthOnly=kFALSE;
   
@@ -91,7 +99,7 @@ class THSParticle {
   Double_t HypBeta(){Double_t pp=fP4.Rho();return pp/sqrt(pp*pp+fPDGMass*fPDGMass);}
   Double_t HypTime(){return fPath/HypBeta()/2.99792e+08*1E9  ;} //in ns
   Double_t DeltaTime(){return HypTime()-fTime;};
-  
+  Int_t Charge();
   Int_t Detector(){return fDetector;}
   
   TLorentzVector* TruthP4p(){return &fTruthP4;};
@@ -102,7 +110,7 @@ class THSParticle {
   Bool_t TruthOnly(){return fTruthOnly;}
 
   
-  void CopyParticle(THSParticle* part);
+  void CopyParticle(THSParticle* part,Bool_t andPDG);
   //Utility functions
   virtual void Print(Option_t *option="") const;
 
@@ -127,8 +135,18 @@ class THSParticle {
   Double_t ResPhi(){return fP4.Phi()-fTruthP4.Phi();};
   Double_t ResRho(){return fP4.Rho()-fTruthP4.Rho();};
   Double_t ResE(){return fP4.E()-fTruthP4.E();};
-  ClassDef(THSParticle,1) //class THSParticle
+  ClassDef(THSParticle,2) //class THSParticle
 };
+inline Int_t THSParticle::Charge(){
+  
+  if(fPDGCode==1E6) return 1;
+  else if(fPDGCode==-1E6) return -1;
+  else {
+    Int_t charge=TDatabasePDG::Instance()->GetParticle(fPDGCode)->Charge();
+    if(charge!=0)charge=(Int_t) charge/TMath::Abs(charge); //just get sign not mag.
+    return charge;
+  }
+}
 
 //inline bool THSParticle::operator<( const THSParticle& rhs ) {cout<<" "<<rhs.fP4.Rho()<<endl;return fP4.Rho() < rhs.fP4.Rho(); }
 //inline bool THSParticle::operator<( const THSParticle& rhs ) {cout<<" "<<rhs.fP4.Rho()<<endl;return this->fP4.Rho() < rhs.fP4.Rho(); }

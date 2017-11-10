@@ -367,10 +367,10 @@ void THSSkeleton::HSFinalState(){
     AddLineAfter("// The return value is currently not used.","   InitEvent();");
     ContinueLineAfter(TString("   do{//In case there is a permutation of particles"));
     ContinueLineAfter(TString("     ")+fFinalName+"::WorkOnEvent();");
-    ContinueLineAfter("     if(!fGoodEvent) continue;//Don't fill anything,User should determine value for fGoodEvent in their project");
+    ContinueLineAfter("     if(!THSFinalState::fGoodEvent) continue;//Don't fill anything,User should determine value for fGoodEvent in their project");
 
     AddLineAfter("THSOutput::HSProcessFill();","   }");
-    ContinueLineAfter(TString("   while(IsPermutating());"));
+    ContinueLineAfter(TString("   while(THSFinalState::IsPermutating());"));
   }
   else{
     AddLineAfter("// The return value is currently not used.",TString("   ")+fFinalName+"::WorkOnEvent();");
@@ -380,25 +380,7 @@ void THSSkeleton::HSFinalState(){
   if(fIsNewTree){
     AddLineAfter("fOutTree=new TTree",TString("   ")+fFinalName+"::FinalStateOutTree(fOutTree);");
   }
-  // if(fIsFinalStatePerm){
-  //   AddLineAfter("THSOutput::HSSlaveBegin(fInput,fOutput);","   SetPermutate();//will permutate like particles");
-  //   AddLineAfter("fReader.SetLocalEntry(entry);","   fgIDoff=1E10;//offset in >1 permutation of particles");	       
-  //   ContinueLineAfter(TString("   do{//In case there is a permutation of particles"));
-  //   ContinueLineAfter(TString("     ")+fFinalName+"::WorkOnEvent();");
-  //   ContinueLineAfter("     if(!fGoodEvent) continue;//Don't fill anything,User should determine value for fGoodEvent in their project");
-
-  //   AddLineAfter("THSOutput::HSProcessFill();","   }");
-  //   ContinueLineAfter(TString("   while(IsPermutating());"));
-  // }
-  // else{
-  //   AddLineAfter("fReader.SetLocalEntry(entry);",TString("   ")+fFinalName+"::WorkOnEvent();");
-  //   ContinueLineAfter("   if(!fGoodEvent) return kTRUE;//Don't fill anything,User should determine value for fGoodEvent in their project");
-  // }
-  // //If newtree need to link project tree
-  // if(fIsNewTree){
-  //   AddLineAfter("fOutTree=new TTree",TString("   ")+fFinalName+"::FinalStateOutTree(fOutTree);");
-  // }
-    
+  
   fCurMacro.SaveSource(fSelName+".C");
   //////////////////////////////////////////////////////////////////  
   //Now with .h
@@ -606,7 +588,9 @@ void THSSkeleton::CreateMyFinalState(){
   fPlace=0;
   FindNextLineLike("//Init functions");
   for(Int_t io=0;io<topos->GetEntries();io++)
-    ContinueLineAfter(Form("  void Init_%d();",io));
+    ContinueLineAfter(Form("  void Init_Iter%d();",io));
+  for(Int_t io=0;io<topos->GetEntries();io++)
+    ContinueLineAfter(Form("  void Topo_%d();",io));
 
   fPlace=0;
   FindNextLineLike("//Final Particles");
@@ -630,15 +614,23 @@ void THSSkeleton::CreateMyFinalState(){
   fPlace=0;
   FindNextLineLike("//Do they correspond to a defined topology?");
   for(Int_t io=0;io<topos->GetEntries();io++)
-    ContinueLineAfter(Form("    else if(fCurrTopo==fTID_%d) Init_%d();",io,io));
+    ContinueLineAfter(Form("    else if(fCurrTopo==fTID_%d) Topo_%d();",io,io));
 
   fPlace=0;
-  FindNextLineLike("//Define topology Init functions");
+  FindNextLineLike("//Define topology Iterator functions");
   for(Int_t io=0;io<topos->GetEntries();io++){
-    ContinueLineAfter(Form("void THS%s::Init_%d(){",fFinalName.Data(),io));
-    ContinueLineAfter(TString("  //define init for detected ")+topos->At(io)->GetName());
-    ContinueLineAfter("  //Set detected particles");
+    ContinueLineAfter(Form("void THS%s::Init_Iter%d(){",fFinalName.Data(),io));
+    ContinueLineAfter("  //THSParticle iterator initialisation");
     ContinueLineAfter("");
+    ContinueLineAfter("//If create iterator must configure it");
+    ContinueLineAfter("  //fDetIter[FTID_0]->ConfigureIters();");
+    ContinueLineAfter("}");
+    
+  }
+  fPlace=0;
+  FindNextLineLike("//Define topology functions");
+  for(Int_t io=0;io<topos->GetEntries();io++){
+    ContinueLineAfter(Form("void THS%s::Topo_%d(){",fFinalName.Data(),io));
     ContinueLineAfter("  //Reconstruct missing or combined particles");
     ContinueLineAfter("");
     ContinueLineAfter("}");
@@ -650,7 +642,11 @@ void THSSkeleton::CreateMyFinalState(){
     TString sparticle=finals->At(io)->GetName();
     ContinueLineAfter(Form("  fFinal.push_back(&f%s);",TString(sparticle(0,sparticle.First(":"))).Data()));
   }
-  
+  fPlace=0;
+  FindNextLineLike("//Initialise particle iters");
+  for(Int_t io=0;io<topos->GetEntries();io++)
+    ContinueLineAfter(Form("  Init_Iter%d();",io));
+
   fCurMacro.SaveSource(TString("THS")+fFinalName+".C");
 
 }
