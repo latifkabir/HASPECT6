@@ -10,6 +10,8 @@ THSHipoReader::THSHipoReader(){
   fHipo = new THipo();
   fHipo->ConfigBank("REC::Particle");
   fHipo->ConfigBank("REC::Scintillator");
+  fHipo->ConfigBank("REC::Calorimeter");
+  fHipo->ConfigBank("REC::Cherenkov");
   fHipo->ConfigBank("REC::ForwardTagger");
   fHipo->ConfigBank("REC::Event");
   //fHipo->ConfigBank("CVTRec::Tracks");
