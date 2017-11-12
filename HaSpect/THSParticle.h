@@ -30,11 +30,11 @@ class THSParticle {
   /* Double_t fPath; */
   /* Double_t fDoca; */
   /* Double_t fEdep; */
-  Float_t fPDGMass;
-  Float_t fMeasMass; //Or other PID info
-  Float_t fTime;
-  Float_t fPath;
-  Float_t fDoca;
+  Float_t fPDGMass=0;
+  Float_t fMeasMass=0; //Or other PID info
+  Float_t fTime=0;
+  Float_t fPath=0;
+  Float_t fDoca=0;
   vector<Float_t> fEdep;
   Int_t fDetector=0; //detector code
 
