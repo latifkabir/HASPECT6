@@ -1,12 +1,20 @@
-//Run with root --hsdata ConvertHSHipoChain.C 
+//Run with root --hsdata ConvertHSHipoChain.C --hsin=/path/to/hipo/files --hsout=/path/to/output/root/files
 {
   THSHipoReader* reader=new THSHipoReader();
   reader->SetWriteGenBranch("Generated");
-  //reader->SetUsePID(kFALSE);
 
   TChain chain("hipo");
   chain.Add(HSin()+"/*.hipo");
-  
+
+  //Create output directory and make sure it is OK to continue of it
+  //already exists
+  if(gSystem->MakeDirectory(HSout().Data())==-1){
+    cout<<"Warning directory "<<HSin()<<" already exists, is it OK to continue? y/n"<<endl;
+    TString ans;
+    cin>>ans;
+    if(ans!=TString("y"))
+      gROOT->ProcessLine(".q"); 
+  }
   gBenchmark->Start("time");
 
   reader->ReadWriteChain(&chain,HSout(),".root");
@@ -16,7 +24,4 @@
   gBenchmark->Stop("time");
   gBenchmark->Print("time");
 
-  // //loop through tree and add a UID, 
-  // reader->SetUID(100); //may want to apply offset
-  // reader->AddUID(HSout());
-}
+ }

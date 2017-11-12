@@ -7,6 +7,32 @@
 
 THipo::THipo(){
   fParser=new THipoBankParser("");
+  
+  //Decide whether input files or dirs from command line
+  Int_t argc=gApplication->Argc();
+  char** argv=gApplication->Argv();
+  for(Int_t i=1;i<argc;i++){
+    TString dirname=argv[i];
+    if(dirname.Contains("--in=")){
+      fUseCLDirs=kTRUE;
+      break;
+    }
+    else
+      fUseCLDirs=kFALSE;
+  }
+  //Look for output dir
+  for(Int_t i=1;i<argc;i++){
+    TString dirname=argv[i];
+    if(dirname.Contains("--out=")){
+      dirname.Remove(0,6);
+      fOutDirName=dirname;
+      cout<<"THipo will write root files to "<<fOutDirName<<endl;
+      if(gSystem->MakeDirectory(fOutDirName)==-1){
+	cout<<"Warning directory "<<fOutDirName<<" already exists or its parent directory does not exist"<<endl;
+      }
+    }
+  }
+  
 }
 THipo::THipo(TString filename){
   fParser=new THipoBankParser(filename);
@@ -26,13 +52,45 @@ void THipo::InitFile(TString filename){
   fRecordCount=0;
 }
 void THipo::AddCommandLineFiles(){
+  //If using command line dirs do that then return
+  if(fUseCLDirs) //This is set in the constructor
+    return AddCommandLineDirs();
   //look for files from command line
+  cout<<"THipo::AddCommandLineFiles() "<<" using input files from commandline"<<endl;
   Int_t argc=gApplication->Argc();
   char** argv=gApplication->Argv();
   for(Int_t i=0;i<argc;i++){
     if(TString(argv[i]).Contains(".hipo")) fInFiles.push_back(argv[i]);
   } 
 }
+void THipo::AddCommandLineDirs(){
+  cout<<"THipo::AddCommandLineDirs() "<<" using input directory from commandline"<<endl;
+  //look for files from command line
+  Int_t argc=gApplication->Argc();
+  char** argv=gApplication->Argv();
+  for(Int_t i=1;i<argc;i++){
+    TString dirname=argv[i];
+    if(dirname.Contains("--in=")){
+      dirname.Remove(0,5);
+      cout<<"THipo::AddCommandLineDirs() checking for files in "<<dirname<<endl;
+      void *dir=gSystem->OpenDirectory(dirname);
+      cout<<dir<<endl;
+      TString fileName;
+      while( (fileName=(gSystem->GetDirEntry(dir)))){
+	cout<<fileName<<endl;
+ 	if(fileName.Contains(TString(".hipo")))
+	  fInFiles.push_back(argv[i]);
+ 	if(fileName==TString("")) break;
+     }
+    }
+    
+  }
+  
+  cout<<"THipo::AddCommandLineDirs() found "<<fInFiles.size()<<" hipo files in --in directories"<<endl;
+  
+ 
+}
+
 void THipo::ToRoot(){
   //Use file list
   for(UInt_t i=0;i<fInFiles.size();i++)
@@ -47,6 +105,12 @@ void THipo::ToRoot(TString filename){
   //if perviously defined by user configuration or previous hipo file
   if(fBanks.size()==0)ConfigAllBanks();
   filename.ReplaceAll(".hipo",".root");
+
+  //Append the output directory name
+  if(fOutDirName.Sizeof()>1){
+    TString newfilename=fOutDirName+"/"+gSystem->BaseName(filename);
+    filename=newfilename;
+  }
   InitOutput(filename);
   //loop over events
   while(NextEvent());

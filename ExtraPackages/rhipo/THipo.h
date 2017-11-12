@@ -205,6 +205,9 @@ class THipo  {
   Long64_t fNEvents=0;
   UInt_t fFilei=0;
 
+  Bool_t fUseCLDirs=kFALSE;
+  TString fOutDirName;
+  
   map<TString,Int_t> fBankMap;
   
  private:
@@ -212,6 +215,7 @@ class THipo  {
   Long64_t ProcessFile(TString filename);
   Bool_t  NextFile();
   void AddCommandLineFiles();
+  void AddCommandLineDirs();
   void ToRoot();
   void ToRoot(TString filename);
   void InitFile(TString filename);
@@ -225,6 +229,7 @@ class THipo  {
    Bool_t NextRecord();
 
    void InitOutput(TString filename);
+   TString GetOutDirName(){return fOutDirName;}
    void CloseOutput();
 };
 

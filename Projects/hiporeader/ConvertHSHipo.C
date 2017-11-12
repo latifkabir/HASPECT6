@@ -1,8 +1,7 @@
-//Run with root --hsdata --THSCLAS12Particle.C ConvertHSHipo.C --hsin=out_out.hipo --hsout=file.root
+//Run with root --hsdata ConvertHSHipo.C --hsin=out_out.hipo --hsout=file.root
 {
   THSHipoReader* reader=new THSHipoReader();
   reader->SetWriteGenBranch("Generated");
-  //reader->SetUsePID(kFALSE);
   
   gBenchmark->Start("time");
 

@@ -35,7 +35,7 @@ class THSParticle {
   Float_t fTime;
   Float_t fPath;
   Float_t fDoca;
-  Float_t fEdep;
+  vector<Float_t> fEdep;
   Int_t fDetector=0; //detector code
 
   vector<Float_t> fCovaMatEntries;
@@ -72,7 +72,8 @@ class THSParticle {
   void SetTime(Double_t time){fTime=time;};
   void SetPath(Double_t path){fPath=path;};
   void SetDoca(Double_t doca){fDoca=doca;};
-  void SetEdep(Double_t edep){fEdep=edep;};
+  void SetEdep(Double_t edep){fEdep.clear();fEdep.push_back(edep);};
+  void AddEdep(Double_t edep){fEdep.push_back(edep);};
   void SetDetector(Int_t det){fDetector=det;};
   void SetMeasMass(Double_t mass){fMeasMass=mass;};
   void TakePDGMass(){SetVectPDG(fP4);}; //Preserves momentum
@@ -92,13 +93,16 @@ class THSParticle {
   Double_t MeasMass(){return fMeasMass;}
   Double_t Time(){return fTime;}
   Double_t MassDiff(){return fPDGMass-fMeasMass;}
-  Double_t Edep(){return fEdep;}
+  vector<Float_t> AllEdep(){return fEdep;}
+  Double_t Edep(){return fEdep[0];}
+  Double_t Edep(Int_t ei){return fEdep[ei];}
   Double_t Doca(){return fDoca;}
   Double_t Path(){return fPath;}
   Double_t Beta(){return fPath/fTime/2.99792e+08*1E9;}//time ns, path m
   Double_t HypBeta(){Double_t pp=fP4.Rho();return pp/sqrt(pp*pp+fPDGMass*fPDGMass);}
   Double_t HypTime(){return fPath/HypBeta()/2.99792e+08*1E9  ;} //in ns
   Double_t DeltaTime(){return HypTime()-fTime;};
+  Double_t DeltaTimeVer(){return DeltaTime()+fVertex.Z()/2.99792e+08*1E9;}
   Int_t Charge();
   Int_t Detector(){return fDetector;}
   
