@@ -35,7 +35,7 @@ void THSParticle::Clear(){
   fDoca=0;
   fP4.SetE(0);
   fP4.SetTheta(0);
-  fVertex.SetMag(0);
+  
 }
 void THSParticle::CopyParticle(THSParticle* part,Bool_t andPDG){
   SetP4(part->P4());
