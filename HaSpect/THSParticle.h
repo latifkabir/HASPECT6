@@ -36,7 +36,7 @@ class THSParticle {
   Float_t fPath=0;
   Float_t fDoca=0;
   vector<Float_t> fEdep;
-  Int_t fDetector=0; //detector code
+  vector<Int_t> fDetector; //detector code
 
   vector<Float_t> fCovaMatEntries;
   TMatrixD fCovarianceMatrix;//!
@@ -72,9 +72,10 @@ class THSParticle {
   void SetTime(Double_t time){fTime=time;};
   void SetPath(Double_t path){fPath=path;};
   void SetDoca(Double_t doca){fDoca=doca;};
-  void SetEdep(Double_t edep){fEdep.clear();fEdep.push_back(edep);};
+  void SetEdep(Double_t edep){fEdep.push_back(edep);};
   void AddEdep(Double_t edep){fEdep.push_back(edep);};
-  void SetDetector(Int_t det){fDetector=det;};
+  void SetDetector(Int_t det){fDetector.push_back(det);};
+  void AddDetector(Int_t det){fDetector.push_back(det);};
   void SetMeasMass(Double_t mass){fMeasMass=mass;};
   void TakePDGMass(){SetVectPDG(fP4);}; //Preserves momentum
   void TakePDGMassFromE(){Double_t rho=sqrt(fP4.E()*fP4.E()-fPDGMass*fPDGMass);fP4.SetRho(rho);}; //preserves energy
@@ -104,7 +105,9 @@ class THSParticle {
   Double_t DeltaTime(){return HypTime()-fTime;};
   Double_t DeltaTimeVer(){return DeltaTime()+fVertex.Z()/2.99792e+08*1E9;}
   Int_t Charge();
-  Int_t Detector(){return fDetector;}
+  Int_t Detector(){return fDetector[0];}
+  Int_t Detector(Int_t id){return fDetector[id];}
+  vector<Int_t> AllDetector(){return fDetector;}
   
   TLorentzVector* TruthP4p(){return &fTruthP4;};
   TLorentzVector TruthP4(){return fTruthP4;};
@@ -113,6 +116,7 @@ class THSParticle {
   
   Bool_t TruthOnly(){return fTruthOnly;}
 
+  void Clear();
   
   void CopyParticle(THSParticle* part,Bool_t andPDG);
   //Utility functions

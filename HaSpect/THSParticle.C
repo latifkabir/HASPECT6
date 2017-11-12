@@ -25,7 +25,18 @@ void THSParticle::Print(Option_t *) const{
   fP4.Print("");
   fVertex.Print("");
 }
-
+void THSParticle::Clear(){
+  fDetector.clear();
+  fEdep.clear();
+  fPDGMass=0;
+  fMeasMass=0; //Or other PID info
+  fTime=0;
+  fPath=0;
+  fDoca=0;
+  fP4.SetE(0);
+  fP4.SetTheta(0);
+  fVertex.SetMag(0);
+}
 void THSParticle::CopyParticle(THSParticle* part,Bool_t andPDG){
   SetP4(part->P4());
   SetVertex(part->Vertex());

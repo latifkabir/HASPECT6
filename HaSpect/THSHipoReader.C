@@ -124,38 +124,32 @@ Bool_t THSHipoReader::ReadEvent(Long64_t entry){
     while(fPBank->NextEntry()){
       THSParticle* particle=fReadParticles->at(ip++);
       fParticles.push_back(particle);
+      particle->Clear();
       particle->SetXYZM(fPx->Val(),fPy->Val(),fPz->Val(),0);
       particle->SetVertex(fVx->Val(),fVy->Val(),fVz->Val());
       //if(fBeta->Val())particle->SetMeasMass(particle->P4p()->Rho()/fBeta->Val());
       if(!fPid->Val()) particle->SetPDGcode(fCharge->ValI()*1E6); //unknown
       else  particle->SetPDGcode(fPid->ValI());
-      particle->SetDetector(100);
-
       //Now look for the associated detector info
       //we must match the detector pindex to the index of this particle entry
-      particle->SetTime(0);
-      particle->SetEdep(0);
-      particle->SetPath(0);
-      particle->SetDetector(0);
-      
       
       while(fSPindex->FindEntry(fPBank->GetEntry())){
 	//Do something if find a particular detector
 	particle->SetTime(fSTime->Val()-fEvTime->Val());
 	particle->SetEdep(fSEnergy->Val());
 	particle->SetPath(fSPath->Val()/100);
-	particle->SetDetector(100+fSSector->Val());
+	particle->SetDetector(1);
      }
  	
       while(fCalPindex->FindEntry(fPBank->GetEntry())){
 	//Do something if find a particular detector
-	particle->AddEdep(fCalEnergy->Val());
-	particle->SetDetector(particle->Detector()+1000);
+	particle->SetEdep(fCalEnergy->Val());
+	particle->SetDetector(2);
      }
       while(fChPindex->FindEntry(fPBank->GetEntry())){
 	//Do something if find a particular detector
 	particle->AddEdep(fChEnergy->Val());
-	particle->SetDetector(particle->Detector()+10000);
+	particle->SetDetector(3);
      }
  	
       while(fFTPindex->FindEntry(fPBank->GetEntry())){
@@ -163,7 +157,7 @@ Bool_t THSHipoReader::ReadEvent(Long64_t entry){
 	particle->SetTime(fFTTime->Val()-fEvTime->Val());
 	particle->SetEdep(fFTEnergy->Val());
 	particle->SetPath(fFTPath->Val()/100);
-	particle->SetDetector(300);
+	particle->SetDetector(10);
 	particle->SetPDGcode(fCharge->ValI()*1E6);
 	
       }
