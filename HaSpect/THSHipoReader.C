@@ -42,6 +42,7 @@ THSHipoReader::THSHipoReader(){
   fChBank=fHipo->GetBank("REC::Cherenkov");
   fChPindex=fChBank->GetItem("pindex");
   fChEnergy=fChBank->GetItem("nphe");
+  fChDetector=fChBank->GetItem("detector");
   //Get the necessary items from REC::FT Bank
   fFTBank=fHipo->GetBank("REC::ForwardTagger");
   fFTPindex=fFTBank->GetItem("pindex");
@@ -136,20 +137,20 @@ Bool_t THSHipoReader::ReadEvent(Long64_t entry){
       while(fSPindex->FindEntry(fPBank->GetEntry())){
 	//Do something if find a particular detector
 	particle->SetTime(fSTime->Val()-fEvTime->Val());
-	particle->SetEdep(fSEnergy->Val());
+	particle->SetDeltaE(fSEnergy->Val());
 	particle->SetPath(fSPath->Val()/100);
-	particle->SetDetector(1);
+	particle->SetDetector(1000*fSSector->Val());
      }
  	
       while(fCalPindex->FindEntry(fPBank->GetEntry())){
 	//Do something if find a particular detector
-	particle->SetEdep(fCalEnergy->Val());
-	particle->SetDetector(2);
+	particle->SetEdep(fCalEnergy->Val()+particle->Edep());
+	particle->SetDetector(particle->Detector()+100);
      }
       while(fChPindex->FindEntry(fPBank->GetEntry())){
 	//Do something if find a particular detector
-	particle->AddEdep(fChEnergy->Val());
-	particle->SetDetector(3);
+	//particle->AddEdep(fChEnergy->Val());
+	particle->SetDetector(particle->Detector()+fChDetector->Val());
      }
  	
       while(fFTPindex->FindEntry(fPBank->GetEntry())){
@@ -157,7 +158,7 @@ Bool_t THSHipoReader::ReadEvent(Long64_t entry){
 	particle->SetTime(fFTTime->Val()-fEvTime->Val());
 	particle->SetEdep(fFTEnergy->Val());
 	particle->SetPath(fFTPath->Val()/100);
-	particle->SetDetector(10);
+	particle->SetDetector(-1000);
 	particle->SetPDGcode(fCharge->ValI()*1E6);
 	
       }
