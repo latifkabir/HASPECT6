@@ -28,6 +28,7 @@ void THSParticle::Print(Option_t *) const{
 void THSParticle::Clear(){
   fDetector=0;
   fEdep=0;
+  fDeltaE=0;
   fPDGMass=0;
   fMeasMass=0; //Or other PID info
   fTime=0;
