@@ -644,6 +644,7 @@ void THSSkeleton::CreateMyFinalState(){
   }
   fPlace=0;
   FindNextLineLike("//Initialise particle iters");
+  fPlace++;
   for(Int_t io=0;io<topos->GetEntries();io++)
     ContinueLineAfter(Form("  Init_Iter%d();",io));
 
