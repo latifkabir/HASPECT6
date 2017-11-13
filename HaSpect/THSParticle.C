@@ -26,8 +26,8 @@ void THSParticle::Print(Option_t *) const{
   fVertex.Print("");
 }
 void THSParticle::Clear(){
-  fDetector.clear();
-  fEdep.clear();
+  fDetector=0;
+  fEdep=0;
   fPDGMass=0;
   fMeasMass=0; //Or other PID info
   fTime=0;
