@@ -39,6 +39,7 @@ THSHipoReader::THSHipoReader(){
   fCalPindex=fCalBank->GetItem("pindex");
   fCalEnergy=fCalBank->GetItem("energy");
   fCalTime=fCalBank->GetItem("time");
+  fCalPath=fCalBank->GetItem("path");
  //Get the necessary items from REC::Cherenkov Bank
   fChBank=fHipo->GetBank("REC::Cherenkov");
   fChPindex=fChBank->GetItem("pindex");
@@ -146,8 +147,10 @@ Bool_t THSHipoReader::ReadEvent(Long64_t entry){
       while(fCalPindex->FindEntry(fPBank->GetEntry())){
 	//Do something if find a particular detector
 	particle->SetEdep(fCalEnergy->Val()+particle->Edep());
-	if(particle->Time()==-(fEvTime->Val()))
+	if(particle->Time()==-(fEvTime->Val())){
 	  particle->SetTime(fCalTime->Val()-fEvTime->Val());
+	  particle->SetPath(fCalPath->Val()/100);
+	}
 	particle->SetDetector(particle->Detector()+100);
      }
       while(fChPindex->FindEntry(fPBank->GetEntry())){
@@ -160,6 +163,7 @@ Bool_t THSHipoReader::ReadEvent(Long64_t entry){
 	//Do something if find a particular detector
 	particle->SetTime(fFTTime->Val()-fEvTime->Val());
 	particle->SetEdep(fFTEnergy->Val());
+	//	particle->SetDeltaE();
 	particle->SetPath(fFTPath->Val()/100);
 	particle->SetDetector(-1000);
 	particle->SetPDGcode(fCharge->ValI()*1E6);

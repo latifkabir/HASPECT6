@@ -53,6 +53,7 @@ class THSHipoReader: public THSDataManager{
   THipoItem* fCalPindex=nullptr;
   THipoItem* fCalEnergy=nullptr;
   THipoItem* fCalTime=nullptr;
+  THipoItem* fCalPath=nullptr;
 
   THipoItem* fChPindex=nullptr;
   THipoItem* fChEnergy=nullptr;
