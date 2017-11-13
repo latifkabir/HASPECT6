@@ -9,7 +9,7 @@
   //Create output directory and make sure it is OK to continue of it
   //already exists
   if(gSystem->MakeDirectory(HSout().Data())==-1){
-    cout<<"Warning directory "<<HSin()<<" already exists, is it OK to continue? y/n"<<endl;
+    cout<<"Warning directory "<<HSout()<<" already exists, is it OK to continue? y/n"<<endl;
     TString ans;
     cin>>ans;
     if(ans!=TString("y"))
