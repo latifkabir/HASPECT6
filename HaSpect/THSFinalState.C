@@ -183,10 +183,9 @@ void THSFinalState::InitParticles(){
   if(!fDetIter[fCurrTopo]) {cout<<"ERROR THSFinalState::InitParticles() No PHSParticleITer defiend for this topology "<<fCurrTopo<<endl; exit(0);}
 
   //Initialise iterators for this event
-  fDetIter[fCurrTopo]->NextCombitorial();
-  fDetIter[fCurrTopo]->SortEvent();
-  
- 
+  //fDetIter[fCurrTopo]->NextCombitorial();
+  //fDetIter[fCurrTopo]->SortEvent();
+  PermutateParticles();
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -228,21 +227,54 @@ void THSFinalState::ProcessEvent(){
  //Process one input event
   InitEvent();
   if(frDetParts)fNDet=frDetParts->size();
-  Int_t firstuse=1;
-  do{
-     WorkOnEvent();
-     if(fFinalTree)
-       if(IsGoodEvent()){
-	 fNUsedReadEvent+=firstuse;
-	 if(firstuse) firstuse=0;
-	 fFinalTree->Fill(); //fill for first combination
-	 fUID++;
-       }
-   }
+  // Int_t firstuse=1;
+
+  while(FSProcess());
   
-  while(IsPermutating());
   FinaliseEvent();
 }
+Bool_t THSFinalState::FSProcess(){
+  
+  if(!WorkOnEvent()) return kFALSE;
+  
+  if(IsGoodEvent()){
+    UserProcess(); 
+  }
+  
+  PermutateParticles();
+  if(IsPermutating())
+    return kTRUE;
+  else
+    return kFALSE;
+}
+void THSFinalState::UserProcess(){
+  //fNUsedReadEvent+=firstuse;
+  //if(firstuse) firstuse=0;
+  if(fFinalTree) fFinalTree->Fill(); //fill for first combination
+  fUID++;
+  
+}
+// void THSFinalState::ProcessEvent(){
+//  //Process one input event
+//   InitEvent();
+//   if(frDetParts)fNDet=frDetParts->size();
+//   Int_t firstuse=1;
+//   do{
+//     if(!WorkOnEvent()) return;
+//      if(fFinalTree)
+//        if(IsGoodEvent()){
+// 	 fNUsedReadEvent+=firstuse;
+// 	 if(firstuse) firstuse=0;
+// 	 fFinalTree->Fill(); //fill for first combination
+// 	 fUID++;
+//        }
+//      PermutateParticles();
+     
+//   }
+  
+//   while(IsPermutating());
+//   FinaliseEvent();
+// }
 
 //////////////////////////////////////////////////////////////
 ///returns true if another valid permuation to be tried \n
@@ -250,14 +282,15 @@ void THSFinalState::ProcessEvent(){
 ///Check through particle types,
 ///if more than 1 of a type permutate through all combinations
 Bool_t THSFinalState::PermutateParticles(){
-  fNPerm++;
   if(!fTryPerm) return kFALSE;
+  if(fIsGenerated) return kFALSE;
+  if(fCurrTopo<0) return kFALSE;
+  fNPerm++;
   if(fIsPermutating1) return kTRUE; //so user can do their own permutation
   fIsPermutating0=kTRUE; //Will be set to false when event over
 
   if(fDetIter[fCurrTopo]->NextCombitorial()){fDetIter[fCurrTopo]->SortEvent();return kTRUE;}
   else fDetIter[fCurrTopo]->SortEvent();
-  
   fIsPermutating0=kFALSE;
   return kFALSE; 
 }

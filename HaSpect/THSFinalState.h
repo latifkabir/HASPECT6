@@ -34,7 +34,7 @@ class THSFinalState{
   virtual void GetEvent(Long64_t uid){}//interface to different readers
   virtual Bool_t WorkOnEvent(){return kFALSE;};
   virtual void FinaliseEvent(){};
-  virtual void InitEvent(){fGotCorrectOne=kFALSE;  fNPerm=0;};
+  virtual void InitEvent(){fGotCorrectOne=kFALSE;  fNPerm=0; };
   
   void SetDetParts(vector<THSParticle*> * dpp){frDetParts=dpp;}
   void SetGenParts(vector<THSParticle*> * dpp){frGenParts=dpp;}
@@ -123,8 +123,13 @@ class THSFinalState{
   
  public :
   Bool_t IsGoodEvent(){return fGoodEvent;}
-  virtual Bool_t IsPermutating(){return fTryPerm*(fIsPermutating0+fIsPermutating1);}
+  virtual Bool_t IsPermutating(){ return fTryPerm*(fIsPermutating0+fIsPermutating1);}
+
   virtual void ProcessEvent();
+  virtual Bool_t FSProcess();
+  virtual void UserProcess();
+  
+  
   virtual void MatchWithGen(THSParticle* part);  
   virtual Bool_t IsCorrectTruth(THSParticle *part);
   virtual void FinalStateOutTree(TTree* tree){tree->Branch("Final",&fFinal);};
