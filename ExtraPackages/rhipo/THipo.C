@@ -79,7 +79,7 @@ void THipo::AddCommandLineDirs(){
       while( (fileName=(gSystem->GetDirEntry(dir)))){
 	cout<<fileName<<endl;
  	if(fileName.Contains(TString(".hipo")))
-	  fInFiles.push_back(argv[i]);
+	  fInFiles.push_back(fileName);
  	if(fileName==TString("")) break;
      }
     }
