@@ -354,24 +354,24 @@ void THSFinalState::CheckTruth(){
 //////////////////////////////////////////////////
 ///Interface to THSParticleIter
 ///Add selected iterator to previously selected particles
-THSParticleIter* THSFinalState::AddSelectToSelected(THSParticleIter* diter,Int_t nsel,Int_t ni,THSParticle* part0,THSParticle* part1,THSParticle* part2,THSParticle* part3,THSParticle* part4,THSParticle* part5,THSParticle* part6,THSParticle* part7,THSParticle* part8,THSParticle* part9){
+THSParticleIter* THSFinalState::AddSelectToSelected(THSParticleIter* diter,Int_t ni,Int_t nsel,THSParticle* part0,THSParticle* part1,THSParticle* part2,THSParticle* part3,THSParticle* part4,THSParticle* part5,THSParticle* part6,THSParticle* part7,THSParticle* part8,THSParticle* part9){
   if(nsel*ni>diter->GetNSel()) cout<<"WARNING THSFinalState::AddSelectToSelected : trying to select more particles than exist in original iterator "<<nsel*ni<<" "<< diter->GetNSel()<<endl;
-  THSParticleIter *new_iter=AddSelectXofY(nsel,ni,part0,part1,part2,part3,part4,part5,part6,part7,part8,part9);
+  THSParticleIter *new_iter=AddSelectXofY(ni,nsel,part0,part1,part2,part3,part4,part5,part6,part7,part8,part9);
   diter->SetSelIter(new_iter);
   return new_iter;
 }
 //////////////////////////////////////////////////
 ///Interface to THSParticleIter
 ///Add selected iterator to remaining particles
-THSParticleIter* THSFinalState::AddSelectToRemainder(THSParticleIter* diter,Int_t nsel,Int_t ni,THSParticle* part0,THSParticle* part1,THSParticle* part2,THSParticle* part3,THSParticle* part4,THSParticle* part5,THSParticle* part6,THSParticle* part7,THSParticle* part8,THSParticle* part9){
-  THSParticleIter *new_iter=AddSelectXofY(nsel,ni,part0,part1,part2,part3,part4,part5,part6,part7,part8,part9);
+THSParticleIter* THSFinalState::AddSelectToRemainder(THSParticleIter* diter,Int_t ni,Int_t nsel,THSParticle* part0,THSParticle* part1,THSParticle* part2,THSParticle* part3,THSParticle* part4,THSParticle* part5,THSParticle* part6,THSParticle* part7,THSParticle* part8,THSParticle* part9){
+  THSParticleIter *new_iter=AddSelectXofY(ni,nsel,part0,part1,part2,part3,part4,part5,part6,part7,part8,part9);
   diter->SetRemIter(new_iter);
   return new_iter;
 }
 //////////////////////////////////////////////////
 ///Interface to THSParticleIter
 ///Add selected iterator
-THSParticleIter* THSFinalState::AddSelectXofY(Int_t nsel,Int_t ni,THSParticle* part0,THSParticle* part1,THSParticle* part2,THSParticle* part3,THSParticle* part4,THSParticle* part5,THSParticle* part6,THSParticle* part7,THSParticle* part8,THSParticle* part9){
+THSParticleIter* THSFinalState::AddSelectXofY(Int_t ni,Int_t nsel,THSParticle* part0,THSParticle* part1,THSParticle* part2,THSParticle* part3,THSParticle* part4,THSParticle* part5,THSParticle* part6,THSParticle* part7,THSParticle* part8,THSParticle* part9){
   
   THSParticleIter *new_iter= new THSParticleIter();
   new_iter->AddEventParticles(part0,part1,part2,part3,part4,part5,part6,part7,part8,part9);
