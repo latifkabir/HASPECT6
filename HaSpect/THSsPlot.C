@@ -159,7 +159,8 @@ void THSsPlot::sPlot(){
   //fSPlot = new RooStats::SPlot("splot_fit", "sPlot Fit", *((RooDataSet*)fData),fModel ,fYields);
   else
     fSPlot = new RooStats::SPlot("splot_fit", "sPlot Fit", *((RooDataSet*)fData),fModel ,fYields);
-    
+  fParameters.setAttribAll("Constant",kFALSE);
+  
   //Check that the fit was succesfull
   Double_t TotalYield=0;
   for(Int_t iy=0;iy<fYields.getSize();iy++)
@@ -399,6 +400,7 @@ void THSsPlot::FitAndStudy(Int_t Nfits){
   if(!fWS->set(TString(GetName())+"PDFs"))DefineSets();
   if(!fModel) TotalPDF();
   FitMany(Nfits);
+  //RooStats::sPlot automoatically adds Sumw2Error() option
   for(Int_t iy=0;iy<fYields.getSize();iy++){
     Double_t  thisYield=((RooRealVar*)&fYields[iy])->getVal();
     if(thisYield<1E-2){
@@ -437,7 +439,17 @@ void THSsPlot::FitAndStudy(Int_t Nfits){
   }
   
 }
+void THSsPlot::FitSavedBins(Int_t Nfits){
+  //do standard THSRooFit 
+  THSRooFit::FitSavedBins(Nfits);
 
+  //in addition combine the weights into 1 and load them
+  THSWeights* wts=new THSWeights("HSsWeights");
+  //Note the output file cannot contain the word Weights (because of Merge), hence Tweights!
+  wts->Merge(fOutDir+"/Weights",fOutDir+"/"+GetName()+"Tweights.root","HSsWeights");
+  fWeights=wts;
+  // fWeights->Save();
+}
 void THSsPlot::DefaultFitOptions(){
   // AddFitOption(RooFit::Extended());
   // if(fData)

@@ -228,6 +228,7 @@ void THSHisto::FillCutsForWeights(){
       FillHistograms(itss->first);
     }
   }
+  fWeight=1;
 }
 
 
@@ -307,4 +308,30 @@ void THSHisto::MakeAxisDir(Int_t iA,TDirectory* curDir){
     curDir->cd(fBins->GetPartName(iA,iB));
     MakeAxisDir(iA+1,gDirectory);
   }
+}
+
+void THSHisto::ParticleList(TString name){
+
+  fSelOutput->Add(MapHist(new TH1F(name+" P",name+" P",100,0,10)));
+  fSelOutput->Add(MapHist(new TH1F(name+" Theta",name+" Theta",90,0,90)));
+  fSelOutput->Add(MapHist(new TH1F(name+" Phi",name+" Phi",90,-180,180)));
+  fSelOutput->Add(MapHist(new TH1F(name+" DeltaTime",name+" DeltaTime",100,-10,10)));
+  fSelOutput->Add(MapHist(new TH2F(name+" DeltaTimeVP",name+" Theta V P",50,0,10,50,-10,10)));
+  fSelOutput->Add(MapHist(new TH2F(name+" ThetaVP",name+" Theta V P",50,0,10,50,0,90)));
+  fSelOutput->Add(MapHist(new TH1F(name+" P_RES",name+" P resolution",100,-0.2,0.2)));
+  fSelOutput->Add(MapHist(new TH1F(name+" Theta_RES",name+" Theta resolution",100,-10,10)));
+  fSelOutput->Add(MapHist(new TH1F(name+" Phi_RES",name+" Phi resolution",100,-10,10)));
+
+}
+void THSHisto::FillParticles(TString name,THSParticle* part){
+  FindHist(name+" P")->Fill(part->P4p()->Rho(),fWeight);//1D
+  FindHist(name+" Theta")->Fill(part->P4p()->Theta()*TMath::RadToDeg(),fWeight);//1D
+  FindHist(name+" Phi")->Fill(part->P4p()->Phi()*TMath::RadToDeg(),fWeight);//1D
+  FindHist(name+" DeltaTime")->Fill(part->DeltaTime(),fWeight);//1D
+  ((TH2D*)FindHist(name+" DeltaTimeVP"))->Fill(part->P4p()->Rho(),part->DeltaTime(),fWeight);
+  ((TH2D*)FindHist(name+" ThetaVP"))->Fill(part->P4p()->Rho(),part->P4p()->Theta()*TMath::RadToDeg(),fWeight);
+  FindHist(name+" P_RES")->Fill(part->ResRho(),fWeight);//1D
+  FindHist(name+" Theta_RES")->Fill(part->ResTheta()*TMath::RadToDeg(),fWeight);//1D
+  FindHist(name+" Phi_RES")->Fill(part->ResPhi()*TMath::RadToDeg(),fWeight);//1D
+
 }

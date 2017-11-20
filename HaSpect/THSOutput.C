@@ -321,6 +321,7 @@ void THSOutput::InitOutTree(){
    if(fOutTree&&fFile){
      fOutTree->SetDirectory(fFile);
      fOutTree->AutoSave();
+     //if proof will add UID in terminate so it is incremented properly
      if(!fOutTree->GetBranch("UID")&&!gProof)fOutTree->Branch("UID", &fgID, "UID/D");
      //if(!fSaveID)//copy existing global ID
        // fOutTree->SetBranchAddress("UID",fCurTree->GetBranch("UID")->GetAddress());

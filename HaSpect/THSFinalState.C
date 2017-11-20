@@ -282,7 +282,7 @@ void THSFinalState::UserProcess(){
 ///Check through particle types,
 ///if more than 1 of a type permutate through all combinations
 Bool_t THSFinalState::PermutateParticles(){
-  if(!fTryPerm) return kFALSE;
+  if(!fTryPerm&&fNPerm>0) return kFALSE;
   if(fIsGenerated) return kFALSE;
   if(fCurrTopo<0) return kFALSE;
   fNPerm++;
@@ -415,8 +415,7 @@ THSParticleIter* THSFinalState::CreateParticleIter(Int_t topo,vector<THSParticle
   diter->SetCombi(THSSelection());
   diter->SetParticles(parts);
   diter->SetNSel(Nsel);
-  cout<<diter<<" "<<topo<<" "<<parts<<endl;
-  if(!fDetIter[topo])
+   if(!fDetIter[topo])
     fDetIter[topo]=diter;
   else
     fDetIter[topo]->SetNextInnerIter(diter);

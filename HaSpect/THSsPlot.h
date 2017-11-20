@@ -48,6 +48,7 @@ public:
   void SetWeights(THSWeights* wts){fWeights=wts;}
   void DeleteWeights(){if(fWeights)delete fWeights;fWeights=nullptr;};
   virtual void FitAndStudy(Int_t Nfits);
+  virtual void FitSavedBins(Int_t Nfits);
   virtual void DefaultFitOptions();
   void SetSaveWeights(Bool_t save=kTRUE){fSaveWeights=save;}
   

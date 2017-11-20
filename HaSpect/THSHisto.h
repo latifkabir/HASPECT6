@@ -26,6 +26,7 @@
 #include <map>
 #include "THSWeights.h"
 #include "THSBins.h"
+#include "THSParticle.h"
 
 using namespace std;
 
@@ -60,8 +61,14 @@ class THSHisto  {
   void FillCutsForWeights();
   void GetWeightEvent(Double_t id);
   void SetWeight(TString species);
-  
+
+  //Functions for histogramming THSPArticles
+  virtual void ParticleList(TString name);
+  virtual void FillParticles(TString sCut,THSParticle* part);
+
  protected:
+  TList* fSelInput=nullptr;  //pointers to the selector input
+  TList* fSelOutput=nullptr;  //pointer to the selector ouput
   Bool_t fIsHisto=0;
   StrTH1_Map fHistNameMap; //connect hist names to TH1* objects
   Vec_StrTH1 fVecHistCut; //a vector with elements for each cut

@@ -97,8 +97,6 @@ Bool_t THSWeights::GetEntryBinarySearch(Long64_t id){
 //////////////////////////////////////////////////
 ///Function to merge weights from many root files
 Long64_t THSWeights::Merge(TString tempName,TString outName,TString wmName){
-  //THSWeights* WM=new THSWeights();
-  //WM->Merge("dirname/prefix","outfile","WeightMap")
 
   if(outName!=TString("")) {
     //TFile* outFile=new TFile(outName,"recreate");

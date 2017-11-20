@@ -61,7 +61,7 @@ void THSFinalTemp::Kinematics(){
 
 void THSFinalTemp::FinalStateOutTree(TTree* tree){
   THSFinalState::fFinalTree=tree;
-  tree->Branch("Final",&fFinal);
+  //tree->Branch("Final",&fFinal);//If you want to save the final THSParticles
   tree->Branch("MissMass",&fMissMass,"MissMass/D");
 
 }
@@ -93,7 +93,6 @@ Bool_t THSFinalTemp::WorkOnEvent(){
   //Can do some checks if event is worth writing or not
   //if()fGoodEvent=kTRUE;
   //else() fGoodEvent =kFALSE;
-  if(fIsGenerated) return kFALSE; //Generated only 1 permutation
-  THSFinalState::PermutateParticles();
-  return kFALSE;
+  if(fIsGenerated) return kTRUE; //Generated only 1 permutation
+  return kTRUE;
 }

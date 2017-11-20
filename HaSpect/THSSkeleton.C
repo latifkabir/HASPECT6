@@ -95,7 +95,7 @@ void THSSkeleton::HSOut_C(){
   ContinueLineAfter("   THSOutput::HSSlaveBegin(fInput,fOutput);");
   MoveToLine("::Process(Long64_t entry)");
   FindNextLineLike("return kTRUE;");
-  ContinueLineAfter("   THSOutput::HSProcessFill();",-1);
+  if(!fIsFinalState) ContinueLineAfter("   THSOutput::HSProcessFill();",-1);
 
   if(fOption.Contains("legacy"))AddLineAfter("HSProcessStart","   GetEntry(entry);",-1);
 
@@ -154,10 +154,12 @@ void THSSkeleton::HSHisto(){
   ContinueLineAfter("   THSHisto::LoadHistograms();");
 
   //Now fill histograms in process
-  AddLineAfter("THSOutput::HSProcessFill();"," //below you can give vars corresponding to fBins axis",-2);
-  ContinueLineAfter("   //if(fBins) fCurrBin=fBins->FindBin(var1,var2,...);//if fBins is defined need to give this meaningful arguments");
-  ContinueLineAfter("   FillHistograms(\"Cut1\");");
-
+  if(!fIsFinalState){
+    AddLineAfter("THSOutput::HSProcessFill();"," //below you can give vars corresponding to fBins axis",-2);
+    ContinueLineAfter("   //if(fBins) fCurrBin=fBins->FindBin(var1,var2,...);//if fBins is defined need to give this meaningful arguments");
+    ContinueLineAfter("   FillHistograms(\"Cut1\");");
+  }
+  
   //Now add new functions at end of file
   fPlace=fCurMacro.GetListOfLines()->GetEntries()+1;
   ContinueLineAfter(TString("void ")+fSelName+"::HistogramList(TString sLabel){");
@@ -374,12 +376,11 @@ void THSSkeleton::HSFinalState(){
   ContinueLineAfter("  THSFinalState::ProcessEvent();");
 
   ///Add user process function
-  FindNextLineLike("Process(Long64_t entry)");
-  fPlace--;
-  ContinueLineAfter(Form("void %s::UserProcess(){",fFinalName.Data()));
-  ContinueLineAfter("   THSOutput::HSProcessFill();",-1);
+  fPlace=0;
+  FindNextLineLike("::Process(Long64_t entry)");
+  ContinueLineAfter(Form("void %s::UserProcess(){",fSelName.Data()),-2);
+  ContinueLineAfter("   THSOutput::HSProcessFill();");
   ContinueLineAfter("}");
-  ReplaceMacroText("THSOutput::HSProcessFill();","");
   
   //If newtree need to link project tree
   if(fIsNewTree){
@@ -407,7 +408,7 @@ void THSSkeleton::HSFinalState(){
   //////////////////////////////////////////////////////////////////  
   //Now with Control
   fCurMacro=TMacro(TString("Control_")+fSelName+".C");
-  AddLineAfter("HSout(","  HSMacPath(\"ADDITIONALMACROPATH_WHEREPROJECTIS\");");
+  // AddLineAfter("HSout(","  HSMacPath(\"ADDITIONALMACROPATH_WHEREPROJECTIS\");");
   ContinueLineAfter("  HSfinal(\""+fFinalName+"\");");
   fCurMacro.SaveSource(TString("Control_")+fSelName+".C");
 }
@@ -615,6 +616,7 @@ void THSSkeleton::CreateMyFinalState(){
   for(Int_t io=0;io<topos->GetEntries();io++){
     ContinueLineAfter(Form("void THS%s::Init_Iter%d(){",fFinalName.Data(),io));
     ContinueLineAfter("  //THSParticle iterator initialisation");
+    ContinueLineAfter(Form("  //For topology %s",topos->At(io)->GetName()));
     ContinueLineAfter("");
     ContinueLineAfter("//If create iterator must configure it");
     ContinueLineAfter(Form("  //fDetIter[fTID_%d]->ConfigureIters();",io));

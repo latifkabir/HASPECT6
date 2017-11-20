@@ -37,8 +37,6 @@ class THSOutput :  public THSHisto{
   TString fStrParticles; //string containing detected particles name
   TString fStepName; //Name of directory in fFile to write source code to
   TList* fStepDir=nullptr; //Directory containing source code
-  TList* fSelInput=nullptr;  //pointers to the selector input
-  TList* fSelOutput=nullptr;  //pointer to the selector ouput
   TList* fCodeList=nullptr;  //pointer to the list of source code
   TList* fListOfFiles=nullptr; //list of analysed file names
   Long64_t fEntry=0; //current entry number in Chain
