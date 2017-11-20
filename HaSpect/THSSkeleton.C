@@ -367,7 +367,7 @@ void THSSkeleton::HSFinalState(){
   //First deal with .C
   fCurMacro=TMacro(fSelName+".C");
 
-  AddLineAfter("THSOutput::HSSlaveBegin(fInput,fOutput);","   //SetPermutate();//will permutate like particles");
+  AddLineAfter("THSOutput::HSSlaveBegin(fInput,fOutput);","   SetPermutate();//will permutate like particles");
   
   AddLineAfter("// The return value is currently not used.",TString("   "));
   ContinueLineAfter("  ");
@@ -409,7 +409,7 @@ void THSSkeleton::HSFinalState(){
   //Now with Control
   fCurMacro=TMacro(TString("Control_")+fSelName+".C");
   // AddLineAfter("HSout(","  HSMacPath(\"ADDITIONALMACROPATH_WHEREPROJECTIS\");");
-  ContinueLineAfter("  HSfinal(\""+fFinalName+"\");");
+  //ContinueLineAfter("  HSfinal(\""+fFinalName+"\");");
   fCurMacro.SaveSource(TString("Control_")+fSelName+".C");
 }
 
@@ -647,6 +647,22 @@ void THSSkeleton::CreateMyFinalState(){
     ContinueLineAfter(Form("  Init_Iter%d();",io));
 
   fCurMacro.SaveSource(TString("THS")+fFinalName+".C");
+
+
+  //Create some sample Run macros
+  gSystem->Exec(Form("cp %s/../Projects/createFinalState/RunFSLund.C RunFSLund%s.C",HSANA.Data(),fFinalName.Data()));
+  fCurMacro=TMacro(TString("RunFSLund")+fFinalName+".C");
+  fPlace=0;
+  ReplaceAllMacroText("XXX",fFinalName);
+
+  fCurMacro.SaveSource(TString("RunFSLund")+fFinalName+".C");
+
+  gSystem->Exec(Form("cp %s/../Projects/createFinalState/RunFSRoot.C RunFSRoot%s.C",HSANA.Data(),fFinalName.Data()));
+  fCurMacro=TMacro(TString("RunFSRoot")+fFinalName+".C");
+  fPlace=0;
+  ReplaceAllMacroText("XXX",fFinalName);
+
+  fCurMacro.SaveSource(TString("RunFSRoot")+fFinalName+".C");
 
 }
 
