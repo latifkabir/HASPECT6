@@ -89,6 +89,8 @@ class THSKinematics{
   //Decay angles
   void MesonDecayHelicity();
   void MesonDecayGJ();
+  void omegaMesonDecayHelicity();
+  void omegaMesonDecayGJ();
   void ElectroCMDecay();
   void PhotoCMDecay();
   void LambdaDecay();
@@ -202,6 +204,44 @@ inline void THSKinematics::MesonDecayGJ(){
   TLorentzVector decD1=decBoost*fMes_d1;
 
   TVector3 angles(decD1.Vect().Dot(xV),decD1.Vect().Dot(yV),decD1.Vect().Dot(zV));
+  fCosTh=angles.CosTheta();
+  fPhi=angles.Phi();
+}
+inline void THSKinematics::omegaMesonDecayHelicity(){
+  //z-axis along -baryon in meson rest frame
+  TLorentzRotation decBoost(-fMes.BoostVector());
+  TLorentzVector decBar=decBoost*fBar;
+  TLorentzVector decGamma=decBoost*fGamma;
+  TVector3 zV=-decBar.Vect().Unit();
+  TVector3 yV=decBar.Vect().Cross(decGamma.Vect()).Unit();
+
+  `TVector3 xV=yV.Cross(zV).Unit();
+
+  TLorentzVector decD1=decBoost*fMes_d1;
+  TLorentzVector decD2=decBoost*fMes_d2;
+  
+  TVector3 normal=(decD1.Vect().Cross(decD2.Vect())).Unit();
+  
+  TVector3 angles(normal.Dot(xV),normal.Dot(yV),normal.Dot(zV));
+  fCosTh=angles.CosTheta();
+  fPhi=angles.Phi();
+ 
+}
+inline void THSKinematics::omegaMesonDecayGJ(){
+  //z-axis along gamma direction in meson decay frame
+  TLorentzRotation decBoost(-fMes.BoostVector());
+  TLorentzVector decGamma=decBoost*fGamma;
+  TLorentzVector decBar=decBoost*fBar;
+  TVector3 zV=decGamma.Vect().Unit();
+  TVector3 yV=decBar.Vect().Cross(decGamma.Vect()).Unit();
+  TVector3 xV=yV.Cross(zV).Unit();
+
+  TLorentzVector decD1=decBoost*fMes_d1;
+  TLorentzVector decD2=decBoost*fMes_d2;
+
+  TVector3 normal=(decD1.Vect().Cross(decD2.Vect())).Unit();
+  
+  TVector3 angles(normal.Dot(xV),normal.Dot(yV),normal.Dot(zV));
   fCosTh=angles.CosTheta();
   fPhi=angles.Phi();
 }
