@@ -1,7 +1,6 @@
 #!/bin/tcsh
 #PBS -N HASPECT_SW
 #PBS -m abe 
-#PBS -M Derek.Glazier@glasgow.ac.uk
 #PBS -l walltime=100:00:00
 #PBS -V
 #Make a directory to work in
