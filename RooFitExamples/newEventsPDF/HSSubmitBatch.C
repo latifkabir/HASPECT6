@@ -16,8 +16,8 @@ void HSSubmitBatch(){
     TString JobName=DataBins->GetBinName(i);
     cout<<"sending JobName "<<JobName<< endl;
     gSystem->Setenv("JOBNAME",JobName);
-    gSystem->Exec("qsub pbs_run");
-    //gSystem->Exec("./pbs_run");
+    //gSystem->Exec("qsub pbs_run");
+    gSystem->Exec("./pbs_run");
     gSystem->Exec("sleep 2");
     cout<<" sent job "<< JobName<<endl;
   }

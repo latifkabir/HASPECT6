@@ -18,7 +18,7 @@
   TChain *chainmc=new TChain("MyModel","mcsignal");
   chainmc->Add("SigData.root");
   chainmc->Add("BG1Data.root");
-  pdf->SetEvTree(chainmc);
+  pdf->SetEvTree(chainmc,RF->GetCut());
   RF->LoadSpeciesPDF("Sig",1); 
   //////////////////////////////Make background PDF
   // RF->Factory("RooHSEventsHistPDF::BG1(Mmiss,alphaB[0,0,5],offB[0,0,0],scaleB[1.0,0.8,1.2])");
@@ -34,7 +34,7 @@
   //Attach MC background data
   TChain *chainmcb2=new TChain("MyModel","mcbackground");
   chainmcb2->Add("BG2Data.root");
-  pdfb->SetEvTree(chainmcb2);
+  pdfb->SetEvTree(chainmcb2,RF->GetCut());
   RF->LoadSpeciesPDF("BG2",1);
 
   //Add data to chain

@@ -1,5 +1,5 @@
 //Run with 
-//root --hsfit FitHSAsymmetryBins.C --SKProtoPDF.cxx
+//For running on farm node
 {
  //Perform fits on already configured binned data files
   TString job=gSystem->Getenv("JOBNAME");

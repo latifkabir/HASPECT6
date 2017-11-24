@@ -5,7 +5,7 @@
 #include <TMath.h>
 
 //Declare variables globally so they can be accessed in all functions
-Double_t Z,Phi,UID=0;
+Double_t Z,Phi,UID,E=0;
 Double_t genZ,genPhi=0;
 
 //Got to declare acceptance functions here
@@ -19,12 +19,14 @@ void MakeEventsRes(Long64_t N=1E6){
   TTree* tree=new TTree("decayAngles","decayAngles");
   tree->Branch("UID",&UID,"UID/D");
   tree->Branch("Z",&Z,"Z/D");
+  tree->Branch("E",&E,"E/D");
   tree->Branch("Phi",&Phi,"Phi/D");
 
   //Loop over N and generate random flat Z and phi
   for(Int_t i=0;i<N;i++){
     UID=i;
     Z=gRandom->Uniform(-1,1);
+    E=gRandom->Uniform(0,10);
     Phi=gRandom->Uniform(-1,1)*TMath::Pi();
     tree->Fill();
   }
@@ -38,6 +40,7 @@ void MakeEventsRes(Long64_t N=1E6){
   
   treea->Branch("UID",&UID,"UID/D");
   treea->Branch("Z",&Z,"Z/D");
+  treea->Branch("E",&E,"E/D");
   treea->Branch("Phi",&Phi,"Phi/D");
   treea->Branch("genZ",&genZ,"genZ/D");
   treea->Branch("genPhi",&genPhi,"genPhi/D");
@@ -46,6 +49,7 @@ void MakeEventsRes(Long64_t N=1E6){
   //Pass these to detector simulation (i.e. add resolution and acceptance)
   for(Int_t i=0;i<N;i++){
     UID=i;
+    E=gRandom->Uniform(0,10);
     genZ=gRandom->Uniform(-1,1);
     genPhi=gRandom->Uniform(-1,1)*TMath::Pi();
     if(DetectorSim0())treea->Fill(); 

@@ -4,14 +4,12 @@
   TString job=gSystem->Getenv("JOBNAME");
   TString fileDir=gSystem->Getenv("FILEDIR");
   THSsPlot* RF=new THSsPlot(job);
-  // RF->SetOutDir("outBins/batch");
-  // RF->SetSPlotRange(2,8);
+
   RF->LoadVariable("Mmiss[0.5,9.5]");//should be same name as variable in tree 
   RF->SetIDBranchName("fgID");
   RooRealVar *var=RF->GetWorkSpace()->var("Mmiss");
   var->setBins(100); 
 
-  //RF->ConfigureSavedBins("outBins2/"); 
   RF->SetBinDir(fileDir+"/"+job); 
 
   

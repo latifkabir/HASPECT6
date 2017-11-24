@@ -468,7 +468,7 @@ void THSSkeleton::CreateRooFitEventsPDF(TString pdfName,TString obsNames,TString
     ContinueLineAfter(TString("   ")+obss->At(io)->GetName()+".SetName(other."+obss->At(io)->GetName()+".GetName());");
   for(Int_t ip=0;ip<pars->GetEntries();ip++)
     ContinueLineAfter(TString("   ")+pars->At(ip)->GetName()+".SetName(other."+pars->At(ip)->GetName()+".GetName());");
-  ContinueLineAfter("   if(fEvTree) SetEvTree(fEvTree);//Needs fProxSet filled first");
+  ContinueLineAfter("   if(fEvTree) SetEvTree(fEvTree,fCut);//Needs fProxSet filled first");
   //Make make sets function need to iterate over obsNames and parNames
   FindNextLineLike("}");
   ContinueLineAfter("void "+pdfName+"::MakeSets(){");

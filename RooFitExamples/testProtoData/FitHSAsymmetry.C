@@ -19,7 +19,7 @@
   TChain *chainMC=new TChain("MyModel");
   chainMC->Add("SimASymRes10.root");
   cout<<"PDF "<<PDF<<endl;
-  PDF->SetEvTree(chainMC);
+  PDF->SetEvTree(chainMC,RF->GetCut());
   RF->LoadSpeciesPDF("SigAsym");
   //PDF->SetNInt(1E4);
   //PDF->CheckIntegralParDep(4);

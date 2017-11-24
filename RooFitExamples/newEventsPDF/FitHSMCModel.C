@@ -4,16 +4,19 @@
   RF->SetOutDir("out/");
   ///////////////////////////////Load Variables
   RF->LoadVariable("Mmiss[0,9.5]");//should be same name as variable in tree 
-  RF->LoadAuxVars("Eg[3,3.1]");//Not to be fitted but limits applied to dataset
+  RF->LoadAuxVars("Eg[-100,100]");//Not to be fitted but limits applied to dataset
+  RF->LoadAuxVars("M2[-100,100]");//Not to be fitted but used in a cut
   RooRealVar * var=RF->GetWorkSpace()->var("Mmiss");
-  var->setBins(100); //number of bins used in PDF histogram 
+  var->setBins(100); //number of bins used in PDF histogram
+
+  RF->SetCut("M2>2&&M2<8");
   //////////////////////////////Make signal PDF
   RF->Factory("RooHSEventsHistPDF::Sig(Mmiss,alpha[0,0,20],off[0,-2,2],scale[1,0.8,1.2])");
   RooHSEventsHistPDF* pdf=dynamic_cast<RooHSEventsHistPDF*>(RF->GetWorkSpace()->pdf("Sig"));
   //Attach MC signal data
   TChain *chainmc=new TChain("MyModel","mcsignal");
   chainmc->Add("SigData.root");
-  pdf->SetEvTree(chainmc);
+  pdf->SetEvTree(chainmc,RF->GetCut());
   RF->LoadSpeciesPDF("Sig",1); 
   //////////////////////////////Make background PDF
   RF->Factory("RooHSEventsHistPDF::BG(Mmiss,alphaB[0,0,5],offB[0,0,0],scaleB[1.0,0.8,1.2])");
@@ -21,7 +24,7 @@
   //Attach MC background data
   TChain *chainmcb=new TChain("MyModel","mcbackground");
   chainmcb->Add("BGData.root");
-  pdfb->SetEvTree(chainmcb);
+  pdfb->SetEvTree(chainmcb,RF->GetCut());
   RF->LoadSpeciesPDF("BG",1);
 
   //Add data to chain

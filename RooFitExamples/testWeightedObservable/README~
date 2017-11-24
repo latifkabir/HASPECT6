@@ -1,0 +1,42 @@
+//////////////////////////////////////////////////////////////////
+In my model I have now generated a signal and background with differet mass sitributions. Also I have constructed an angle Phi which in the case of the signal has a polarisation depedent cos(2Phi) distribution. It is necessary to save the polarisation state as in integer PolState for use in the fit PDF, in general this should be -1,0,1, as well as the magnitude of polarisation as a seperate double. Note the polarisation is Egamma dependent and so must be handled event by event.
+//////////////////////////////////////////////////////////////////
+Background Subtraction
+First I need to perform an sPlot fit to extract signal from background. This is exactly the same as for testSimple so heere I just copy the code to perform this in bins. This is file FitHSSimpleBins.C and you should be able to just run with root FitHSSimpleBins.C. This will perform 4 fits split in Eg and save the results and weights in outSignal
+
+Making a new PDF class
+See
+https://root.cern.ch/root/html/tutorials/roofit/rf104_classfactory.C.htmlRooClass
+///////////////////////////////////////////////////////////////////
+Make a PDF class called PhiAsymmetry which depends on variable Phi and in addition the magitude of polarisation Pol and the polarisation state PolState, both of which are also recoreded in the tree. It has 2 fit parameters A and B which will be the cos and sin coefficeients respectively.
+start root and type/paste :
+root [0] RooClassFactory::makePdf("PhiAsymmetry","Phi,Pol,PolState,A,B") ;
+exit
+you should now have 2 skeleton class files :
+PhiAsymmetry.cxx
+PhiAsymmetry.h
+you can edit PhiAsymmetry.cxx evaluate function with the functional form you want to fit. Also you will need to change the PolState declaration from RooReal to RooCategory in the .h and .cxx files.
+
+
+The form of the function is given in the Model1.C file which generated the events :
+ TF1* fPhip=new TF1("phip","1+[2]*([0]*cos(2*TMath::DegToRad()*x)+[1]*sin(2*TMath::DegToRad()*x))",-180,180);
+
+
+This class must be loaded in the Fit macro :
+ gROOT->LoadMacro("PhiAsymmetry.cxx++"); //Load my new PDF class too!
+
+///////////////////////////////////////////////////////////////////
+Fit macro FitHSAsymmetry.C
+Note it is a slightly different manager class when not using sWeights as much of the functionality is not required. Here we use the base interface class
+  THSRooFit* RF=new THSRooFit("AFit");
+Apart from that most of the code should be very similar.
+Declare the new PDF for fitting with. The fit parameters are A and B which are restricted between -1 and 1
+  RF->Factory("PhiAsymmetry::SigAsym( Phi,Pol,PolState,A[0,-1,1],B[0,-1,1] )");
+
+The weights from the previous sPlot step should be attached to the data set :
+  RF->LoadWeights("outSignal/WeightsbinFit.root ","WeightMap");
+  RF->SetWeightName("Signal"); //Same as Signal species in FitHSSimpleBins
+
+To run the fit now use the FitWithBins function rather than RunWeights
+ RF->FitWithBins(1);//argument gives number of parameter fits to perform
+ 

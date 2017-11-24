@@ -2,17 +2,11 @@
 //root --hsfit FitHSSimpleBins.C
 {
   THSsPlot* RF=new THSsPlot("binFit");
-  RF->SetOutDir("outBins2/");
+  RF->SetOutDir("outSignal/");
  ///////////////////////////////Load Variables
   RF->LoadVariable("Mmiss[0,10]");//should be same name as variable in tree
   RF->LoadBinVars("Eg",1,3,4);//should be same name as variable in tree 
   RF->LoadBinVars("M1",4,0,10);//should be same name as variable in tree 
-  RF->LoadAuxVars("M2[-100,100]");//Load M2 so we can cut on it
-
-  RF->AddCut("M2>4");
-  cout<<RF->GetCut()<<endl;
-  RF->GetWorkSpace()->var("M2")->Print();
-  exit(0);
    ///////////////////////////Load Data
   TChain chain("MyModel");
   chain.Add("Data.root");

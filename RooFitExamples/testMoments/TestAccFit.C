@@ -23,7 +23,7 @@
   //Add data (see MakeEventsRes.C)
   TChain chain("decayAngles");
   chain.Add("accepted_res.root");
-  pdf->SetEvTree(&chain);
+  pdf->SetEvTree(&chain,RF->GetCut());
   pdf->SetNInt(100000);//Number of events to use in integration calc.
   pdf->SetUseWeightsGen(kFALSE); //Use accept/reject not weights
   RF->GetWorkSpace()->import(*pdf); //import pdf into workspace

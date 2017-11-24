@@ -31,9 +31,15 @@
   RF->FitSavedBins(1);
   gBenchmark->Stop("Binned");
   gBenchmark->Print("Binned");
-  // RF->DrawTreeVar("Mmiss",100,0,10);
-  // RF->DrawTreeVar("M1",100,0,10);
-  // RF->DrawTreeVar("M2",100,0,10);
+ 
+   //chain deleted so recreate for extra plots  
+  TChain chain2("MyModel");
+  chain2.Add("Data.root");
+  RF->LoadDataSet(&chain2);
+ 
+  RF->DrawTreeVar("M1",100,0,10);
+  RF->DrawTreeVar("M2",100,0,10);
 
-
+  //Save merged weights
+  RF->GetWeights()->Save();
 }

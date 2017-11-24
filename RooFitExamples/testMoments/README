@@ -18,6 +18,7 @@ The tree includes the following variable branches :
 UID = unique event ID for each event
 Z = reconstructed decay cos theta
 Phi = reconstructed decay phi
+E = additional variable for splitting in bins
 genZ = generated decay cos theta
 genPhi = generated decay phi
 
@@ -57,3 +58,7 @@ Here the N datasets are just taken from the initial accepted_res.root file so yo
 This can be run using the TestAccStudy.C macro instead of TestAccFit.C
 
 In addition to the ResultsAFit_X.root files (i.e. one file for every fit) There will be an overall file giving the fit paramter distribution and pull distributions.
+
+//////////////////////////////////////
+Binned study
+This is shown in TestAccStudyBins.C

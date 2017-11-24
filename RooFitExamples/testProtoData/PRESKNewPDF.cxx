@@ -52,7 +52,7 @@ ClassImp(SKNewPDF)
    PolState.SetName(other.PolState.GetName());
    A.SetName(other.A.GetName());
    B.SetName(other.B.GetName());
-   if(fEvTree) SetEvTree(fEvTree);//Needs fProxSet filled first
+   if(fEvTree) SetEvTree(fEvTree,fCut);//Needs fProxSet filled first
  } 
 void SKNewPDF::MakeSets(){
    fProxSet.push_back(&Phi);

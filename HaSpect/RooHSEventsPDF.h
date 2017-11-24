@@ -53,6 +53,8 @@ class RooHSEventsPDF : public RooAbsPdf {
   vector<Int_t> fMCCat;
   vector< RooRealProxy* > fParSet;
   vector<Bool_t> fIsCat;
+  TString fCut; //cut for applying to event tree
+  
   void InitSets();
   RooArgSet VarSet(Int_t iset) const;
     
@@ -78,8 +80,8 @@ class RooHSEventsPDF : public RooAbsPdf {
   Bool_t CheckRange(const char* rangeName) const; //only integrate EvTree over specifed variable range
 
   void SetNInt(Long64_t n){fNInt=n;}
-  virtual Bool_t SetEvTree(TChain* tree,Long64_t ngen=0);
-  virtual Bool_t SetEvTree(TTree* tree,Long64_t ngen=0);
+  virtual Bool_t SetEvTree(TChain* tree,TString cut,Long64_t ngen=0);
+  virtual Bool_t SetEvTree(TTree* tree,TString cut,Long64_t ngen=0);
   void SetNMCGen(Long64_t N){fNMCGen=N;}
   TTree* GetEvTree(){return fEvTree;};
   TVectorD GetMCVar(){return fMCVar;}
@@ -98,6 +100,9 @@ class RooHSEventsPDF : public RooAbsPdf {
   virtual void ResetTree();
   virtual Double_t GetIntegralWeight() const {return 1;} ;
   Bool_t AddProtoData(RooDataSet* data);
+  void SetCut(TString cut){fCut=cut;};
+  TString GetCut(){return fCut;}
+  
   ClassDef(RooHSEventsPDF,1) // Yor description goes here...
 };
  

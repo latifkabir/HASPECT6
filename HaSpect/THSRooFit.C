@@ -82,10 +82,10 @@ void THSRooFit::LoadDataSet(TTree* tree,Bool_t toWS){
   ftoWS=toWS;
   //Take a tree and convert to RooDataSet
   if(!tree) {cout<<"Tree does not exist "<<endl;exit(0);}
-  fTree=tree;
+  fTree=tree;//->CopyTree(fCut);
   RooArgSet dataVars(fVariables,fAuxVars);
   if(fID) dataVars.add(*fID);
-  fData=new RooDataSet(tree->GetName(),tree->GetTitle(),dataVars,RooFit::Import(*tree)); //make roodatset if not splitting onto bins
+  fData=new RooDataSet(tree->GetName(),tree->GetTitle(),dataVars,RooFit::Import(*tree),RooFit::Cut(fCut)); //make roodatset if not splitting onto bins
   if(toWS) fWS->import(*fData); //import if told to
   else if(!(fDataBins))if(!fInWeights)fWS->import(*fData); //if not told to import if not bins
   //else if not told to import and there are bins don't import
@@ -257,8 +257,27 @@ void THSRooFit::LoadVariable(TString opt){
 // void THSRooFit::LoadCategory(TString opt){
 //   fVariables.add(*(fWS->factory(opt)));
 // }
+
+/////////////////////////////////////////////////////////
+///THSRooFit::LoadAuxVars can bes used to cut input trees and keeping
+///variable bracnhes in binned or reduced trees
+///the limits of the varibale are added to Cut and applied to data import
 void THSRooFit::LoadAuxVars(TString opt){
-  fAuxVars.add(*(fWS->factory(opt)));
+  RooAbsArg* var=(RooAbsArg*) fWS->factory(opt);
+  fAuxVars.add(*(var));
+  //  fAuxVars.add(*(fWS->factory(opt)));
+  RooRealVar* varreal=nullptr;
+  //RooCategory* varcat=nullptr;
+  if((varreal=dynamic_cast<RooRealVar*>(var))){
+    if(fCut.Sizeof()>1)fCut+="&&";
+    fCut+=Form("%s>%lf&&%s<%lf",varreal->GetName(),varreal->getMin(),varreal->GetName(),varreal->getMax());
+    
+  }
+  // else if((varcat=dynamic_cast<RooCategory*>(var))){
+  //   if(fCut.Sizeof()>1)fCut+="&&";
+  //   fCut+=Form("%s>%lf&&%s<%lf",varcat->GetName(),varcat->getMin(),varcat->GetName(),varcat->getMax());
+  // }
+  return;
 }
 void THSRooFit::LoadBinVars(TString opt,Int_t nbins,Double_t min,Double_t max){
   if(!fDataBins) fDataBins=new THSBins("HSDataBins");
@@ -545,7 +564,7 @@ THSRooFit*  THSRooFit::CreateSubFitBins(TTree* ctree,TString rfname,Bool_t CopyT
   //create a fit object for a subset of data either by setting cut
   //or by fTree->SetEntryList prior to calling this function 
   //It will be deleted by this object
-  cout<<"THSRooFit::CreateSubFitBins with tree "<<ctree->GetName()<<endl;
+  // cout<<"THSRooFit::CreateSubFitBins with tree "<<ctree->GetName()<<endl;
   THSRooFit* RFa=new THSRooFit(rfname);
   if(fBinnedFit)RFa->SetBinnedFit();
   RFa->SetSingleSpecies(fSingleSp);
@@ -556,7 +575,7 @@ THSRooFit*  THSRooFit::CreateSubFitBins(TTree* ctree,TString rfname,Bool_t CopyT
   RFa->SetNStudyTrials(fNStudyTrials);
   RFa->SetStudyPDF(fStudyPDF);
   RFa->SetStudyPlot(fStudyPlot);
-
+  RFa->SetCut(fCut);
   //Done configuring RF
   fRooFits->Add(RFa);
   RFa->LoadWorkSpace(fWS,GetName());
@@ -564,6 +583,8 @@ THSRooFit*  THSRooFit::CreateSubFitBins(TTree* ctree,TString rfname,Bool_t CopyT
 
   for(Int_t ill=0;ill<fFitOptions.GetSize();ill++)
     RFa->AddFitOption(*((RooCmdArg*)fFitOptions.At(ill)));
+  if(!ctree) return RFa;
+  //Load the data tree if given
   TDirectory *saveDir=gDirectory;
   if(ctree->GetDirectory())ctree->GetDirectory()->cd();
   if(CopyTree)RFa->LoadDataSet(ctree->CopyTree(""));//will use any EntryList
@@ -642,34 +663,34 @@ void THSRooFit::ConfigureSavedBins(TString dirname,TString pdfname){
   if(!fDataBins->GetN()) {Error("THSRooFit::ConfigureSavedBins()","No bins found in directory = %s",fBinDir.Data());return;}
   return;
 }
-void THSRooFit::FitWithBins(Int_t Nfits){
-  if(!fWS->set(TString(GetName())+"PDFs"))DefineSets();
-  MakeBins();
-  cout<<"THSRooFit::FitWithBins(); number of bins "<<fDataBins->GetN()<<endl;
-  TDirectory *saveDir=gDirectory;
-  //Open made bins file (safer saving to harddrive)
-  THSBins* savedBins=new THSBins("HSDataBins",fOutDir+"DataEntries.root");
-  fTree->SetBranchStatus("*",0);
-  for(Int_t i=0;i<fVariables.getSize();i++){//only copy variable branches for speed
-    fTree->SetBranchStatus(fVariables[i].GetName(),1);
-  }
-  //but always need ID branch
-  if(fTree->GetBranch(fIDBranchName)){
-   fTree->SetBranchStatus(fIDBranchName,1);
-  }
-  for(Int_t i=0;i<fDataBins->GetN();i++){
-    THSRooFit* rf=CreateSubFitBins(savedBins->GetBinnedTree(fTree,i),savedBins->GetBinName(i),kFALSE);
+// void THSRooFit::FitWithBins(Int_t Nfits){
+//   if(!fWS->set(TString(GetName())+"PDFs"))DefineSets();
+//   MakeBins();
+//   cout<<"THSRooFit::FitWithBins(); number of bins "<<fDataBins->GetN()<<endl;
+//   TDirectory *saveDir=gDirectory;
+//   //Open made bins file (safer saving to harddrive)
+//   THSBins* savedBins=new THSBins("HSDataBins",fOutDir+"DataEntries.root");
+//   fTree->SetBranchStatus("*",0);
+//   for(Int_t i=0;i<fVariables.getSize();i++){//only copy variable branches for speed
+//     fTree->SetBranchStatus(fVariables[i].GetName(),1);
+//   }
+//   //but always need ID branch
+//   if(fTree->GetBranch(fIDBranchName)){
+//    fTree->SetBranchStatus(fIDBranchName,1);
+//   }
+//   for(Int_t i=0;i<fDataBins->GetN();i++){
+//     THSRooFit* rf=CreateSubFitBins(savedBins->GetBinnedTree(fTree,i),savedBins->GetBinName(i),kFALSE);
   
-    if(fModel)rf->TotalPDF();//total PDF defined in parent so also for child
-    rf->FitMany(Nfits);
-    rf->SavePlots(fOutDir+TString("Results")+fDataBins->GetBinName(i)+".root");
+//     if(fModel)rf->TotalPDF();//total PDF defined in parent so also for child
+//     rf->FitMany(Nfits);
+//     rf->SavePlots(fOutDir+TString("Results")+fDataBins->GetBinName(i)+".root");
 
-    delete rf;
-  }
-  cout<<"THSRooFit::FitWithBins() Done all Fits "<<endl;
-  ///??delete savedBins;
-}
-void THSRooFit::FitSavedBins(Int_t Nfits){
+//     delete rf;
+//   }
+//   cout<<"THSRooFit::FitWithBins() Done all Fits "<<endl;
+//   ///??delete savedBins;
+// }
+void THSRooFit::FitSavedBins(Int_t Nfits,Bool_t cleanup){
   if(!fDataBins->GetN()) return;
   Info("THSRooFit::FitSaved","Goint to run %d fits from %s",Nfits,fBinDir.Data());
   if(!fWS->set(TString(GetName())+"PDFs"))DefineSets();
@@ -693,7 +714,8 @@ void THSRooFit::FitSavedBins(Int_t Nfits){
 	//pdf has ownership of chain when set
 	chainMC->Add(GetBinDir()+GetBins()->GetBinName(ib)+TString("/Tree")+hspdf->GetName()+".root");
 	//	if(!hspdf->SetEvTree(chainMC)) {Error("THSRooFit::FitSavedBins","problem with chain for %s",hspdf->GetName());exit(0);}
-	hspdf->SetEvTree(chainMC);
+
+	hspdf->SetEvTree(chainMC,fCut);
 	hspdf->AddProtoData(rf->GetDataSet());
 	delete chainMC;
       }
@@ -701,8 +723,49 @@ void THSRooFit::FitSavedBins(Int_t Nfits){
     //Configured the fir for this bin now do it
     if(fModel)rf->TotalPDF();//total PDF defined in parent so also for child
     rf->FitAndStudy(Nfits);
-    delete rf;
-    delete chainData;
+    if(cleanup){
+      delete rf;rf=nullptr;
+      delete chainData;chainData=nullptr;
+    }
+  }
+  
+}
+void THSRooFit::StudySavedBins(Int_t Nfits,Bool_t cleanup){
+  if(!fDataBins->GetN()) return;
+  Info("THSRooFit::StudySavedBins","Going to run %d fits from %s",Nfits,fBinDir.Data());
+  if(!fWS->set(TString(GetName())+"PDFs"))DefineSets();
+  TDirectory *saveDir=gDirectory;
+  //Loop over bins
+  for(Int_t ib=0;ib<GetBins()->GetN();ib++){
+    // Fit1SavedBin(ib,Nfits);
+    //TChain *chainData=new TChain("BinnedTree");
+    //chainData->Add(GetBinDir()+GetBins()->GetBinName(ib)+TString("/Tree")+"Data"+".root");
+    //cout<<"Data chain "<<GetBinDir()+GetBins()->GetBinName(ib)+TString("/Tree")+"Data"+".root"<<" "<<chainData->GetEntries()<<" "<<chainData->GetName()<<endl;
+    THSRooFit* rf=CreateSubFitBins(nullptr,GetBins()->GetBinName(ib),kFALSE);
+     //look for RooHSEventsPDFs to get MC events trees
+    for(Int_t ip=0;ip<fPDFs.getSize();ip++){
+      RooAbsPdf* pdf=rf->GetWorkSpace()->pdf(fPDFs[ip].GetName());
+      RooHSEventsPDF* hspdf=0;
+      if((hspdf=dynamic_cast<RooHSEventsPDF*>(pdf))){    
+	Info("HSRooFit::FitSaved","Found RooHsAbsEventsPDF %s",hspdf->GetName());
+	hspdf->ResetTree();
+	cout<<"MC CHAIN "<<fPDFs[ip].GetName()<<endl;
+	TChain *chainMC=new TChain("BinnedTree");
+	//pdf has ownership of chain when set
+	chainMC->Add(GetBinDir()+GetBins()->GetBinName(ib)+TString("/Tree")+hspdf->GetName()+".root");
+	//	if(!hspdf->SetEvTree(chainMC)) {Error("THSRooFit::FitSavedBins","problem with chain for %s",hspdf->GetName());exit(0);}
+
+	hspdf->SetEvTree(chainMC,fCut);
+	//	hspdf->AddProtoData(rf->GetDataSet());
+	delete chainMC;
+      }
+    } 
+    //Configured the fir for this bin now do it
+    if(fModel)rf->TotalPDF();//total PDF defined in parent so also for child
+    rf->StudyFit();
+    if(cleanup){
+      delete rf;rf=nullptr;
+    }
   }
   
 }
@@ -726,7 +789,7 @@ void THSRooFit::FitBatchBin(Int_t Nfits){
       TChain *chainMC=new TChain("BinnedTree");
       //pdf has ownership of chain when set
       chainMC->Add(GetBinDir()+TString("/Tree")+hspdf->GetName()+".root");
-      hspdf->SetEvTree(chainMC);
+      hspdf->SetEvTree(chainMC,fCut);
       hspdf->AddProtoData(GetDataSet());
       //      if(!hspdf->SetEvTree(chainMC)) {Error("THSRooFit::FitSavedBins","problem with chain for %s",hspdf->GetName());exit(0);}
     }

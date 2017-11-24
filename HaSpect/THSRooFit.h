@@ -54,6 +54,8 @@ class THSRooFit : public TNamed {
   TString fBinDir;
   TString fWeightName; //Input Weight species for this dataset
   TString fStudyPDF; //pdf to be studied
+  TString fCut; //Apply cut to data tree and RooHSEventsPDF
+  
   RooFitResult* fResult=nullptr;   //RooFit result
   THSWeights* fInWeights=nullptr; //! //input weights for dataset to be fitted
   THSBins* fDataBins=nullptr; //! 
@@ -127,7 +129,10 @@ public:
     fIDBranchName=str;
     fID=dynamic_cast<RooRealVar*>((fWS->factory(str+"[0,9.99999999999999e14]")));
     fWS->defineSet("ID",RooArgSet(*fID));
-   }
+  }
+   void AddCut(TString cut){if(fCut.Sizeof()>1){fCut+="&&";}fCut+=cut;};
+  void SetCut(TString cut){fCut=cut;}
+  TString GetCut(){return fCut;}
   void CheckRange();
   void SetParVals(RooFitResult *res);
   void SetParVals(RooArgList pars);
@@ -147,14 +152,15 @@ public:
   virtual THSRooFit*  CreateSubFitBins(TTree* ctree,TString rfname,Bool_t CopyTree=kTRUE);//from alredy selected tree
   void SavePlots(TString filename);
   virtual void FitMany(Int_t Nfits=1);
-  void FitSavedBins(Int_t Nfits);
-  void FitBatchBin(Int_t Nfits);
+  virtual void FitSavedBins(Int_t Nfits,Bool_t cleanup=kTRUE);
+  virtual void StudySavedBins(Int_t Nfits,Bool_t cleanup=kTRUE);
+  virtual void FitBatchBin(Int_t Nfits);
   virtual void FitAndStudy(Int_t Nfits=1);
   void RandomisePars();
   void MakeBins();
   void MakeBins(TTree* tree,TString name);
   void MakeBinnedTrees(TTree* tree,TString name);
-  virtual void FitWithBins(Int_t Nfits=1);
+  // virtual void FitWithBins(Int_t Nfits=1);
   // virtual void PrepareForFarm();
   THSBins* GetBins(){return fDataBins;}
   void SetOutDir(TString name){fOutDir=name;fOutDir+="/";gSystem->MakeDirectory(fOutDir);}

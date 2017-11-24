@@ -2,7 +2,7 @@
 {
 
   THSRooFit* RF=new THSRooFit("SF");
-  RF->SetOutDir("outBins/");
+  RF->SetOutDir("outBins2/");
   ///////////////////////////////Load Variables
   RF->LoadAuxVars("Mmiss[0,10]");//Save Mmiss event between 0-10
   RF->LoadBinVars("Eg",3,3,3.3);//Make 3 bins in Eg between 3 and 3.3 

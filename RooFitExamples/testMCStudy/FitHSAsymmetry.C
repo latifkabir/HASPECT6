@@ -17,7 +17,7 @@
   RooHSEventsPDF* PDF=dynamic_cast<RooHSEventsPDF*>(RF->GetWorkSpace()->pdf("SigAsym"));
   TChain *chainMC=new TChain("MyModel");
   chainMC->Add("SimDataSymRes10.root");
-  if(!PDF->SetEvTree(chainMC)) exit(0);
+  if(!PDF->SetEvTree(chainMC,RF->GetCut())) exit(0);
   //PDF->SetNInt(5E4);
   PDF->CheckIntegralParDep(4);
   //  PDF->SetConstInt();
@@ -27,7 +27,7 @@
   RF->LoadDataSet(chainData);
   gBenchmark->Start("Binned");
   RF->SetStudyPDF("SigAsym");
-  RF->SetNStudyTrials(20);
+  RF->SetNStudyTrials(5);
   PDF->SetUseWeightsGen(kFALSE);
   //RF->SetStudyPlot();
   // RF->FitMany(1); //Just fit no study 1=>will only attempt 1 fit, if>1 will randomise paramters and try fitting however many times specified

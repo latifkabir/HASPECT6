@@ -33,6 +33,7 @@ RooHSEventsPDF::RooHSEventsPDF(const RooHSEventsPDF& other, const char* name) : 
     fConstInt=other.fConstInt;
     fCheckInt=other.fCheckInt;
     fUseWeightsGen=other.fUseWeightsGen;
+    fCut=other.fCut;
   }
 RooHSEventsPDF::~RooHSEventsPDF(){
   //RooFit clones everything so I need to give the original
@@ -310,14 +311,18 @@ Bool_t RooHSEventsPDF::CheckChange() const{
   }
   return hasChanged;
 }
-Bool_t RooHSEventsPDF::SetEvTree(TChain* tree,Long64_t ngen){
+Bool_t RooHSEventsPDF::SetEvTree(TChain* tree,TString cut,Long64_t ngen){
   if(!tree->GetEntries()) return kFALSE;
-  return SetEvTree(tree->CloneTree());
+  return SetEvTree(tree->CloneTree(),cut,ngen);
 }
-Bool_t RooHSEventsPDF::SetEvTree(TTree* tree,Long64_t ngen){
+Bool_t RooHSEventsPDF::SetEvTree(TTree* tree,TString cut,Long64_t ngen){
   if(!tree->GetEntries())return kFALSE;
-  Info("RooHSEventsPDF::SetEvTree"," with name %s",tree->GetName());
-  fEvTree=tree;
+  Info("RooHSEventsPDF::SetEvTree"," with name %s and cut %s",tree->GetName(),cut.Data());
+  fCut=cut;
+  
+  if(fCut.Sizeof()!=1)fEvTree=tree->CopyTree(fCut);
+  else fEvTree=tree;
+  fCut=""; //remove cut once events filtered as branches may be removed 
   fNMCGen=ngen;
   fConstInt=fEvTree->GetEntries();
    // RooArgList set1=fVarSet.at(0);
@@ -520,7 +525,7 @@ Bool_t RooHSEventsPDF::AddProtoData(RooDataSet* data){
   }
   
   
-  SetEvTree(fEvTree);
+  SetEvTree(fEvTree,fCut);
   fEvTree->Print();
   fEvTree->GetEntry(0);
  

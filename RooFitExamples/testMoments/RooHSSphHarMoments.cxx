@@ -100,7 +100,7 @@ RooHSSphHarMoments::RooHSSphHarMoments(const RooHSSphHarMoments& other, const ch
   //   }
 
      
-   if(fEvTree) SetEvTree(fEvTree);//Needs fProxSet filled first
+   if(fEvTree) SetEvTree(fEvTree,fCut);//Needs fProxSet filled first
  } 
 RooArgSet RooHSSphHarMoments::CreateMoments(Int_t _lmax,Int_t _Mmax){
   RooArgSet parSet("MomY");

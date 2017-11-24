@@ -6,8 +6,8 @@
   RF->SetOutDir("outM1/");
   ///////////////////////////////Load Variables
   RF->LoadVariable("M1[0,10]");//should be same name as variable in tree 
-  RF->LoadBinVars("Mmiss",1,0,10);//Not to be fitted but limits applied to dataset
-  RF->LoadBinVars("Eg",10,3,4);//Not to be fitted but limits applied to dataset
+  RF->LoadAuxVars("Mmiss[0,10]");//Not to be fitted but limits applied to dataset
+  RF->LoadBinVars("Eg",2,3,4);//bin the data in this variable
   RooRealVar * var=RF->GetWorkSpace()->var("M1");
   var->setBins(100); //number of bins used in PDF histogram
   RF->SetIDBranchName("fgID");
@@ -57,13 +57,14 @@
   RF->FitSavedBins(1); //argument = number of test fits with random initial pars
   gBenchmark->Stop("M1Fit");
   gBenchmark->Print("M1Fit");
-  THSWeights* wts=new THSWeights("TotalWeights");
-  wts->Merge("outM1/WeightsMmiss","outM1/WeightsTotal.root","HSsWeights");
-  RF->SetTree(&chain);
-  RF->SetWeights(wts);
+ TChain chain2("MyModel");
+  chain2.Add("Data.root");
+  RF->LoadDataSet(&chain2);
+ 
   RF->DrawTreeVar("Mmiss",100,0,10);
   RF->DrawTreeVar("M1",100,0,10);
   RF->DrawTreeVar("M2",100,0,10);
 
-
+  RF->GetWeights()->Save();
+ 
 }

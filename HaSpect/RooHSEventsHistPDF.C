@@ -103,7 +103,7 @@ ClassImp(RooHSEventsHistPDF)
    if(other.fOffConstr)fOffConstr=(RooGaussian*)other.fOffConstr->Clone();
    if(other.fScaleConstr)fScaleConstr=(RooGaussian*)other.fScaleConstr->Clone();
    fVarMax=other.fVarMax;
-   if(fEvTree) SetEvTree(fEvTree);//Needs fProxSet filled first
+   if(fEvTree) SetEvTree(fEvTree,fCut);//Needs fProxSet filled first
    
    MakeSets();
     
@@ -161,13 +161,13 @@ Double_t RooHSEventsHistPDF::evaluateMC(Double_t mcx) const {
   
 }
 
-Bool_t RooHSEventsHistPDF::SetEvTree(TChain* tree,Long64_t ngen){
+Bool_t RooHSEventsHistPDF::SetEvTree(TChain* tree,TString cut,Long64_t ngen){
 
-  return RooHSEventsHistPDF::SetEvTree(tree->CloneTree(),ngen); //standard intilisation
+  return RooHSEventsHistPDF::SetEvTree(tree->CloneTree(),cut,ngen); //standard intilisation
 }
-Bool_t RooHSEventsHistPDF::SetEvTree(TTree* tree,Long64_t ngen){
+Bool_t RooHSEventsHistPDF::SetEvTree(TTree* tree,TString cut,Long64_t ngen){
 
-  Bool_t OK=RooHSEventsPDF::SetEvTree(tree,ngen); //standard intilisation
+  Bool_t OK=RooHSEventsPDF::SetEvTree(tree,cut,ngen); //standard intilisation
   //Now also need to create underlying HistPdf
   if(!fHist)CreateHistPdf();
   if(OK&&fHist) return kTRUE;
